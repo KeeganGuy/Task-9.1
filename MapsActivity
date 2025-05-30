@@ -1,0 +1,50 @@
+package com.example.lostfound;
+
+import com.example.lostfound.Advert;
+import com.example.lostfound.AdvertDatabase;
+import android.os.Bundle;
+import androidx.fragment.app.FragmentActivity;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import java.util.List;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+    private GoogleMap mMap;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+
+        SupportMapFragment mapFragment = (SupportMapFragment)
+                getSupportFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        List<Advert> adverts = AdvertDatabase.getInstance(this).advertDao().getAll();
+
+        for (Advert advert : adverts) {
+            LatLng location = new LatLng(advert.lat, advert.lng);
+            mMap.addMarker(new MarkerOptions()
+                    .position(location)
+                    .title(advert.name + " (" + advert.postType + ")"));
+
+        }
+
+
+        if (!adverts.isEmpty()) {
+            LatLng first = new LatLng(adverts.get(0).lat, adverts.get(0).lng);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(first, 12));
+        }
+    }
+}
