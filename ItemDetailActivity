@@ -1,0 +1,38 @@
+package com.example.lostfound;
+
+import android.os.Bundle;
+import android.widget.TextView;
+import android.widget.Button;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class ItemDetailActivity extends AppCompatActivity {
+    TextView tvTitle, tvDescription;
+    Button btnRemove;
+    Advert advert;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_item_detail);
+
+        tvTitle = findViewById(R.id.tvTitle);
+        tvDescription = findViewById(R.id.tvDescription);
+        btnRemove = findViewById(R.id.btnRemove);
+
+        int advertId = getIntent().getIntExtra("advertId", -1);
+        if (advertId != -1) {
+            advert = AdvertDatabase.getInstance(this).advertDao().getById(advertId);
+            if (advert != null) {
+                tvTitle.setText(advert.name);
+                tvDescription.setText(advert.description);
+            }
+        }
+
+        btnRemove.setOnClickListener(v -> {
+            if (advert != null) {
+                AdvertDatabase.getInstance(this).advertDao().delete(advert);
+                finish();
+            }
+        });
+    }
+}
